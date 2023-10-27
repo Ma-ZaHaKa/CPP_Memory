@@ -7,6 +7,7 @@
 #include <fstream>
 #include <sstream>
 #include <vector>
+#include <psapi.h>
 #include <algorithm>
 #include <iomanip>
 #include <vector>
@@ -22,7 +23,7 @@
 //template <typename T> T ReadPtr(void* ptr) { return *static_cast<const T*>(ptr); }
 //void* IntADDR2VoidPtr(int _addr) { return reinterpret_cast<void*>(_addr); }
 //int VoidPtrToInt(void* _addr) { return reinterpret_cast<int>(_addr); }
-
+std::string PointerToString(void* pointer);
 
 //DIRECTORY
 bool DirectoryExists(std::string& folderPath);
@@ -51,8 +52,16 @@ std::string FileReadAllText(std::string& filePath);
 
 
 
-std::vector<std::string> split(std::string s, std::string delimiter);
-std::string StringToUpper(std::string strToConvert);
+//----STRINGS-----------------------------------------------------------
+std::vector<std::string> Split(std::string s, std::string delimiter);
+std::string ToUpper(std::string strToConvert);
+std::string ToLower(std::string strToConvert);
+std::string Trim(std::string& str);
+std::string Replace(std::string& input, std::string& target, std::string& replacement);
+
+
+
+
 
 int _RandVUKL(int min, int max);
 int _RandVKL(int min, int max);
@@ -79,3 +88,55 @@ std::string url_encode(const std::string& input);
 std::string base64_decode(const std::string& encoded);
 std::string base64_encode(const std::string& input);
 std::string url_decode(const std::string& input);
+
+
+void Mbox(const char* msg, const char* title);
+float _max(float a, float b);
+float _min(float a, float b);
+
+HANDLE InitConsole();
+void LeaveConsole(HANDLE hConsole);
+
+bool DKSleep(float deltaTime, float wait_time, float& sleepBuffer);
+
+//std::chrono::high_resolution_clock::time_point previousTime = std::chrono::high_resolution_clock::now();
+//float SleepBuffer = 0.0f;
+//
+//
+//Events::drawHudEvent += []
+//{
+//	//--calc fps
+//	std::chrono::high_resolution_clock::time_point currentTime = std::chrono::high_resolution_clock::now();
+//	std::chrono::duration<float> deltaTime = std::chrono::duration_cast<std::chrono::duration<float>>(currentTime - previousTime);
+//	previousTime = currentTime;
+//
+//	if (DKSleep(deltaTime.count(), delayDuration, SleepBuffer)) { canSetWantedLevel = true; } // true когда таймер выйдет
+//
+//}
+
+
+void MboxSTD(const std::string& msg, const std::string& title);
+void EXIT_F();
+void EXIT_S();
+void RaiseError(const char* fmt, ...);
+
+
+//#include "TOOLS\Tools.h"
+//std::string ccfg = "VW_CFG.ini";
+//float ddelayDuration = 2.0f;
+//float hhealthdiff = 10.0f;
+
+bool _MkCFG(std::string& config_path);
+void _InitCFG(std::string& config_path);
+
+//Events::initGameEvent += [] {
+//	if (initRwEventFIX) { return; } // adapter to initRwEvent
+//	else { initRwEventFIX = true; }
+//	InitCFG(ccfg);
+//};
+
+char* constchar2char(const char* constString);
+char* string2char(std::string constString);
+std::string Pointer2String(void* pointer);
+
+std::vector<std::string> ListProcessModules();

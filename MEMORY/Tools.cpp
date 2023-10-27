@@ -5,7 +5,8 @@
 // in header
 //template <typename T> T ReadPtr(void* ptr) { return *static_cast<const T*>(ptr); }
 //void* IntADDR2VoidPtr(int _addr) { return reinterpret_cast<void*>(_addr); }
-
+//int VoidPtrToInt(void* _addr) { return reinterpret_cast<int>(_addr); }
+std::string PointerToString(void* pointer) { std::stringstream ss; ss << pointer; return "0x" + ss.str(); }
 
 
 //DIRECTORY
@@ -185,7 +186,16 @@ std::string FileReadAllText(std::string& filePath)
 
 
 
-std::vector<std::string> split(std::string s, std::string delimiter)
+
+
+
+
+
+
+
+
+//----STRINGS-----------------------------------------------------------------
+std::vector<std::string> Split(std::string s, std::string delimiter)
 {
 	size_t pos_start = 0, pos_end, delim_len = delimiter.length();
 	std::string token;
@@ -201,11 +211,54 @@ std::vector<std::string> split(std::string s, std::string delimiter)
 	return res;
 }
 
-std::string StringToUpper(std::string strToConvert)
+std::string ToUpper(std::string strToConvert)
 {
-	std::transform(strToConvert.begin(), strToConvert.end(), strToConvert.begin(), ::toupper);
+	std::transform(strToConvert.begin(), strToConvert.end(), strToConvert.begin(), std::toupper); //::toupper
 	return strToConvert;
 }
+std::string ToLower(std::string strToConvert)
+{
+	std::transform(strToConvert.begin(), strToConvert.end(), strToConvert.begin(), std::tolower);
+	return strToConvert;
+}
+
+std::string Trim(std::string& str)
+{
+	// Find the first non-whitespace character from the beginning.
+	size_t start = str.find_first_not_of(" \t\n\r\f\v");
+
+	if (start == std::string::npos) {
+		// If the string consists only of whitespace, return an empty string.
+		return "";
+	}
+
+	// Find the last non-whitespace character from the end.
+	size_t end = str.find_last_not_of(" \t\n\r\f\v");
+
+	// Calculate the length of the trimmed substring.
+	size_t length = end - start + 1;
+
+	// Extract and return the trimmed substring.
+	return str.substr(start, length);
+}
+std::string Replace(std::string& input, std::string& target, std::string& replacement)
+{
+	std::string result = input;
+	size_t startPos = 0;
+
+	while ((startPos = result.find(target, startPos)) != std::string::npos) {
+		result.replace(startPos, target.length(), replacement);
+		startPos += replacement.length();
+	}
+
+	return result;
+}
+
+
+
+
+
+
 
 // std::mt19937
 int _RandVUKL(int min, int max)
@@ -517,4 +570,197 @@ std::string Repeat(char character, int count) {
 		result += character;
 	}
 	return result;
+}
+
+
+void Mbox(const char* msg, const char* title)
+{
+	MessageBoxA(HWND_DESKTOP, msg, title, MB_SYSTEMMODAL | MB_ICONWARNING);
+}
+
+
+float _max(float a, float b) { return (((a) > (b)) ? (a) : (b)); }
+float _min(float a, float b) { return (((a) < (b)) ? (a) : (b)); }
+
+HANDLE InitConsole() // with proto
+{
+	AllocConsole();
+
+	//SetConsoleOutputCP(866);
+	setlocale(LC_ALL, "Russian");
+	SetConsoleOutputCP(1251);
+	SetConsoleCP(1251);
+
+
+	freopen("CONIN$", "r", stdin);
+	freopen("CONOUT$", "w", stdout);
+
+	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+	SetConsoleTextAttribute(hConsole, FOREGROUND_GREEN);
+
+	return hConsole;
+}
+
+//void LeaveConsole(HANDLE hConsole = nullptr)
+void LeaveConsole(HANDLE hConsole) // with proto
+{
+	if (hConsole != nullptr) { SetConsoleTextAttribute(hConsole, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE); } // Reset to default color
+	FreeConsole();
+}
+
+bool DKSleep(float deltaTime, float wait_time, float& sleepBuffer)
+{
+	sleepBuffer += deltaTime; // Накапливаем время
+	// Если накопленное время больше или равно времени ожидания
+	if (sleepBuffer >= wait_time) {
+		sleepBuffer = 0.0f; // Сбрасываем накопленное время
+		return true; // Время ожидания истекло, возвращаем true
+	}
+	return false; // Время ожидания не истекло, возвращаем false
+}
+
+//std::chrono::high_resolution_clock::time_point previousTime = std::chrono::high_resolution_clock::now();
+//float SleepBuffer = 0.0f;
+//
+//
+//Events::drawHudEvent += []
+//{
+//	//--calc fps
+//	std::chrono::high_resolution_clock::time_point currentTime = std::chrono::high_resolution_clock::now();
+//	std::chrono::duration<float> deltaTime = std::chrono::duration_cast<std::chrono::duration<float>>(currentTime - previousTime);
+//	previousTime = currentTime;
+//
+//	if (DKSleep(deltaTime.count(), delayDuration, SleepBuffer)) { canSetWantedLevel = true; } // true когда таймер выйдет
+//
+//}
+
+//void MboxSTD(const std::string& msg, const std::string& title = "title")
+void MboxSTD(const std::string& msg, const std::string& title)
+{
+	MessageBoxA(HWND_DESKTOP, msg.c_str(), title.c_str(), MB_SYSTEMMODAL | MB_ICONWARNING);
+}
+void EXIT_F()
+{
+	ExitProcess(EXIT_FAILURE);
+}
+void EXIT_S()
+{
+	ExitProcess(EXIT_SUCCESS);
+}
+void RaiseError(const char* fmt, ...)
+{
+	char buf[2048];
+	va_list args;
+	va_start(args, fmt);
+	vsprintf_s(buf, fmt, args);
+	va_end(args);
+
+	MessageBoxA(HWND_DESKTOP, buf, "Fatal Error", MB_SYSTEMMODAL | MB_ICONWARNING);
+	ExitProcess(EXIT_FAILURE);
+}
+
+
+//#include "TOOLS\Tools.h"
+std::string ccfg = "VW_CFG.ini";
+float ddelayDuration = 2.0f;
+float hhealthdiff = 10.0f;
+
+bool _MkCFG(std::string& config_path)
+{
+	std::ofstream outfile(config_path);
+	if (outfile.is_open()) {
+
+		outfile << ";delayDuration задержка после розыска (с)" << std::endl;
+		outfile << "2.0f" << std::endl;
+
+		outfile << ";healthdiff разница здоровья до и после удара" << std::endl;
+		outfile << "10.0f" << std::endl;
+		outfile << std::endl;
+
+		outfile.close();
+		return true;
+	}
+	return false;
+}
+
+void _InitCFG(std::string& config_path)
+{
+	//if (!std::ifstream(config_path))
+	if (!FileExists(config_path))
+	{ // mk ini
+		//std::ofstream outfile(config_path);
+		if (!_MkCFG(config_path)) { Mbox("InitCFG couldnt create ini file!", "ERROR"); return; }
+	}
+	//if (!FileExists(config_path)) { Mbox("InitCFG couldnt create ini file!", "ERROR"); return; }
+
+	//std::ifstream infile(config_path);
+	//std::locale loc("C");
+	//infile.imbue(loc); // для парсинга 1.2f
+
+	//if (infile.is_open())
+	//{
+	//	std::string firstLine = ""; // soundline
+
+	//	std::string line;
+	//	int i = 0;
+	//	while (getline(infile, line)) // FUCKING getline(infile >> std::ws, tmp) coudnt parse
+	//	{
+	//		++i;
+	//		int s5 = std::stoi(line);
+	//		int SpinStartSpeed = std::stof(line);
+	//	}
+	//	infile.close();
+	//}
+
+	std::vector<std::string> cfg = FileReadAllLines(config_path);
+
+	std::string _delayDuration = cfg[1];
+	std::string _healthdiff = cfg[3];
+
+	// Устанавливаем временную локаль с точкой в качестве разделителя
+	std::locale prevLoc = std::locale::global(std::locale("C"));
+
+	ddelayDuration = std::stof(_delayDuration);
+	hhealthdiff = std::stof(_healthdiff);
+
+	// Восстанавливаем предыдущую локаль
+	std::locale::global(prevLoc);
+}
+
+//Events::initGameEvent += [] {
+//	if (initRwEventFIX) { return; } // adapter to initRwEvent
+//	else { initRwEventFIX = true; }
+//	InitCFG(ccfg);
+//};
+
+char* constchar2char(const char* constString) { return const_cast<char*>(constString); }
+char* string2char(std::string constString) { return const_cast<char*>(constString.c_str()); }
+std::string Pointer2String(void* pointer) { std::stringstream ss; ss << pointer; return "0x" + ss.str(); }
+
+std::vector<std::string> ListProcessModules()
+{
+	std::vector<std::string> modules;
+	DWORD processId = GetCurrentProcessId();
+	HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, processId);
+
+	if (hProcess == NULL) {
+		std::cerr << "Failed to open process" << std::endl;
+		return modules;
+	}
+
+	HMODULE hModules[1024];
+	DWORD cbNeeded;
+
+	if (EnumProcessModules(hProcess, hModules, sizeof(hModules), &cbNeeded)) {
+		for (DWORD i = 0; i < (cbNeeded / sizeof(HMODULE)); i++) {
+			TCHAR szModuleName[MAX_PATH];
+
+			if (GetModuleFileNameEx(hProcess, hModules[i], szModuleName, sizeof(szModuleName) / sizeof(TCHAR))) {
+				modules.push_back(szModuleName);
+			}
+		}
+	}
+
+	CloseHandle(hProcess);
+	return modules;
 }
